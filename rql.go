@@ -383,7 +383,7 @@ func (p *Parser) sort(fields []string) string {
 		}
 		expect(p.fields[field] != nil, "unrecognized key %q for sorting", field)
 		expect(p.fields[field].Sortable, "field %q is not sortable", field)
-		colName := p.colName(field)
+		colName := field
 		if orderBy != "" {
 			colName += " " + orderBy
 		}
@@ -468,18 +468,8 @@ func (p *parseState) field(f *field, v interface{}) {
 // fmtOp create a string for the operation with a placeholder.
 // for example: "name = ?", or "age >= ?".
 func (p *Parser) fmtOp(field string, op Op) string {
-	colName := p.colName(field)
+	colName := field
 	return colName + " " + op.SQL() + " ?"
-}
-
-// colName formats the query field to database column name in cases the user configured a custom
-// field separator. for example: if the user configured the field separator to be ".", the fields
-// like "address.name" will be changed to "address_name".
-func (p *Parser) colName(field string) string {
-	if p.FieldSep != DefaultFieldSep {
-		return strings.Replace(field, p.FieldSep, DefaultFieldSep, -1)
-	}
-	return field
 }
 
 func (p *Parser) op(op Op) string {
